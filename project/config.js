@@ -1,0 +1,4 @@
+const CONFIG = {
+  GEMINI_API_KEY: "AIzaSyBlIePigKNLEdibcu7CbisSPrmatgx3Yfc",
+  UNSPLASH_ACCESS_KEY: "ys6PT466TFF_uSV2_f-UG1qvo0HtXw8_QokYS5iTDsM"
+};
