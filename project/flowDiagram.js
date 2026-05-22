@@ -1,6 +1,5 @@
 const container = document.getElementById('flowDiagramContainer');
 
-// Predefined colors for parallel groups
 const GROUP_COLORS = [
   { bg: '#ffe0b2', border: '#f57c00' }, // Orange
   { bg: '#c8e6c9', border: '#388e3c' }, // Green
@@ -12,16 +11,14 @@ const GROUP_COLORS = [
 window.renderFlowDiagram = (parallelProcesses, allSteps) => {
   container.innerHTML = '';
 
-  // Fallback to purely sequential if parallel_processes is empty, malformed, or missing
   if (!parallelProcesses || !Array.isArray(parallelProcesses) || parallelProcesses.length === 0) {
     renderSequentialFallback(allSteps);
     return;
   }
 
   try {
-    let html = '';
+    let html = '<div class="flow-container">';
 
-    // Create a map for quick step lookup by step_number
     const stepMap = {};
     if (allSteps && Array.isArray(allSteps)) {
       allSteps.forEach(step => {
@@ -32,14 +29,9 @@ window.renderFlowDiagram = (parallelProcesses, allSteps) => {
     parallelProcesses.forEach((group, index) => {
       const color = GROUP_COLORS[index % GROUP_COLORS.length];
 
+      html += `<div class="flow-group-wrapper">`;
+      html += `<div class="flow-group-label">${group.label || 'Process Group ' + (index + 1)}</div>`;
       html += `<div class="flow-row">`;
-
-      // If group is parallel (multiple separate threads running together)
-      // Usually, Gemini might just put sequential things in one array.
-      // We assume if steps are provided as an array of step numbers in "can_run_with" or similar,
-      // they might be sub-groups. But based on the schema, steps is an array of step numbers.
-      // Let's render the steps in this group side-by-side if they are parallel, or sequentially if they are a block.
-      // For visual simplicity as requested: "Parallel steps sit side by side in the same row"
 
       if (Array.isArray(group.steps) && group.steps.length > 0) {
         group.steps.forEach(stepId => {
@@ -54,7 +46,6 @@ window.renderFlowDiagram = (parallelProcesses, allSteps) => {
           `;
         });
       } else {
-        // Fallback for empty group
          html += `
             <div class="flow-node" style="background-color: ${color.bg}; border-color: ${color.border};">
               <div class="flow-node-title">${group.label || 'Process'}</div>
@@ -62,14 +53,20 @@ window.renderFlowDiagram = (parallelProcesses, allSteps) => {
           `;
       }
 
-      html += `</div>`;
+      html += `</div>`; // end flow-row
+      html += `</div>`; // end flow-group-wrapper
 
-      // Add arrow connecting to the next row (if not the last row)
       if (index < parallelProcesses.length - 1) {
-        html += `<div class="flow-arrow">↓</div>`;
+        html += `<div class="flow-connector">
+                   <svg width="24" height="40" viewBox="0 0 24 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                     <path d="M12 0L12 38" stroke="var(--saffron)" stroke-width="2" stroke-linecap="round"/>
+                     <path d="M6 32L12 38L18 32" stroke="var(--saffron)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                   </svg>
+                 </div>`;
       }
     });
 
+    html += '</div>';
     container.innerHTML = html;
   } catch (error) {
     console.error("Error rendering flow diagram, falling back to sequential:", error);
@@ -83,7 +80,7 @@ function renderSequentialFallback(allSteps) {
     return;
   }
 
-  let html = '';
+  let html = '<div class="flow-container">';
   allSteps.forEach((step, index) => {
     html += `
       <div class="flow-row">
@@ -94,9 +91,15 @@ function renderSequentialFallback(allSteps) {
       </div>
     `;
     if (index < allSteps.length - 1) {
-      html += `<div class="flow-arrow">↓</div>`;
+        html += `<div class="flow-connector">
+                   <svg width="24" height="40" viewBox="0 0 24 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                     <path d="M12 0L12 38" stroke="var(--saffron)" stroke-width="2" stroke-linecap="round"/>
+                     <path d="M6 32L12 38L18 32" stroke="var(--saffron)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                   </svg>
+                 </div>`;
     }
   });
+  html += '</div>';
   container.innerHTML = html;
 }
 

@@ -11,33 +11,9 @@ const recipeContent = document.getElementById('recipeContent');
 let currentSearchQuery = '';
 let currentRecipeName = '';
 
-const SYSTEM_PROMPT = `You are a recipe assistant for an Indian household. Generate recipes using everyday Indian kitchen ingredients — atta, dal, common spices, mustard oil, ghee, pressure cooker etc. If a recipe requires a fancy ingredient, mention it but suggest where it can be ordered online in India or provide a desi substitute. Be practical for a middle-class Indian home kitchen.
-
-Return the recipe as a JSON object with this exact structure:
-{
-  "name": "",
-  "overview": {
-    "prep_time": "",
-    "cook_time": "",
-    "serves": "",
-    "difficulty": ""
-  },
-  "ingredient_groups": [
-    { "group_name": "", "items": [] }
-  ],
-  "equipment": [],
-  "steps": [
-    { "step_number": 1, "instruction": "", "duration_minutes": 0, "parallel_group": "" }
-  ],
-  "tips": [],
-  "variations": [],
-  "nutrition": {
-    "calories": "", "protein": "", "carbs": "", "fat": ""
-  },
-  "parallel_processes": [
-    { "group_id": "", "label": "", "steps": [], "can_run_with": [] }
-  ]
-}`;
+const SYSTEM_PROMPT = `You are a recipe assistant. The user wants to cook a specific dish.
+Generate a practical recipe. If it is an Indian dish, use everyday Indian kitchen ingredients. If it is a non-Indian dish, generate the authentic recipe, or suggest a localized Indian version if authentic ingredients are hard to find.
+Always return the recipe as a valid JSON object matching the requested schema exactly.`;
 
 // Event Listeners
 searchBtn.addEventListener('click', handleSearch);
@@ -76,7 +52,66 @@ async function fetchRecipe(query) {
           parts: [{ text: `I want to cook: ${query}` }]
         }],
         generationConfig: {
-          response_mime_type: "application/json"
+          response_mime_type: "application/json",
+          responseSchema: {
+            type: "OBJECT",
+            properties: {
+              name: { type: "STRING" },
+              overview: {
+                type: "OBJECT",
+                properties: {
+                  prep_time: { type: "STRING" },
+                  cook_time: { type: "STRING" },
+                  serves: { type: "STRING" },
+                  difficulty: { type: "STRING" }
+                }
+              },
+              ingredient_groups: {
+                type: "ARRAY",
+                items: {
+                  type: "OBJECT",
+                  properties: {
+                    group_name: { type: "STRING" },
+                    items: { type: "ARRAY", items: { type: "STRING" } }
+                  }
+                }
+              },
+              equipment: { type: "ARRAY", items: { type: "STRING" } },
+              steps: {
+                type: "ARRAY",
+                items: {
+                  type: "OBJECT",
+                  properties: {
+                    step_number: { type: "INTEGER" },
+                    instruction: { type: "STRING" },
+                    duration_minutes: { type: "INTEGER" }
+                  }
+                }
+              },
+              tips: { type: "ARRAY", items: { type: "STRING" } },
+              variations: { type: "ARRAY", items: { type: "STRING" } },
+              nutrition: {
+                type: "OBJECT",
+                properties: {
+                  calories: { type: "STRING" },
+                  protein: { type: "STRING" },
+                  carbs: { type: "STRING" },
+                  fat: { type: "STRING" }
+                }
+              },
+              parallel_processes: {
+                type: "ARRAY",
+                items: {
+                  type: "OBJECT",
+                  properties: {
+                    label: { type: "STRING" },
+                    steps: { type: "ARRAY", items: { type: "INTEGER" } }
+                  }
+                }
+              }
+            },
+            required: ["name", "overview", "ingredient_groups", "equipment", "steps", "nutrition", "parallel_processes"]
+          }
         }
       })
     });
