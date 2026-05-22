@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Desi Kitchen Assistant</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Header & Search -->
+  <header class="main-header">
+    <div class="container header-container">
+      <h1>Desi Kitchen Assistant</h1>
+      <div class="search-container">
+        <input type="text" id="searchInput" placeholder="What do you want to cook today? e.g., Aloo Gobi">
+        <button id="searchBtn">Get Recipe</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- Error State -->
+    <div id="errorState" class="error-state hidden">
+      <p id="errorMessage">Something went wrong.</p>
+      <button id="retryBtn">Retry</button>
+    </div>
+
+    <!-- Recommendations Panel (Visible on load or refresh) -->
+    <section id="recommendationsPanel" class="recommendations-section">
+      <div class="section-header">
+        <h2>Suggestions for You</h2>
+        <button id="refreshSuggestionsBtn" class="icon-btn" aria-label="Refresh Suggestions">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21v-5h5"/></svg>
+        </button>
+      </div>
+      <div id="recommendationsList" class="recommendations-grid">
+        <!-- Skeleton loaders will go here initially -->
+      </div>
+    </section>
+
+    <!-- Main Recipe Display (Hidden initially) -->
+    <article id="recipeDisplay" class="recipe-container hidden">
+
+      <!-- Loading Skeleton -->
+      <div id="recipeSkeleton" class="skeleton-loader hidden">
+        <div class="skeleton skeleton-title"></div>
+        <div class="skeleton-flex">
+          <div class="skeleton skeleton-card"></div>
+          <div class="skeleton skeleton-card"></div>
+          <div class="skeleton skeleton-card"></div>
+          <div class="skeleton skeleton-card"></div>
+        </div>
+        <div class="skeleton skeleton-text"></div>
+        <div class="skeleton skeleton-text"></div>
+        <div class="skeleton skeleton-text"></div>
+      </div>
+
+      <!-- Actual Recipe Content -->
+      <div id="recipeContent" class="hidden">
+        <h2 id="recipeTitle" class="recipe-title"></h2>
+
+        <section id="recipeOverview" class="overview-cards"></section>
+
+        <div class="recipe-grid">
+          <!-- Left Column -->
+          <div class="recipe-left">
+            <section class="recipe-section">
+              <h3>Ingredients</h3>
+              <div id="recipeIngredients"></div>
+            </section>
+
+            <section class="recipe-section">
+              <h3>Equipment Needed</h3>
+              <ul id="recipeEquipment" class="equipment-list"></ul>
+            </section>
+
+            <section class="recipe-section">
+              <h3>Nutrition (per serving)</h3>
+              <div id="recipeNutrition" class="nutrition-pills"></div>
+            </section>
+          </div>
+
+          <!-- Right Column -->
+          <div class="recipe-right">
+            <section class="recipe-section">
+              <h3>Step-by-Step Flow</h3>
+              <div id="flowDiagramContainer" class="flow-diagram-wrapper"></div>
+            </section>
+
+            <section class="recipe-section">
+              <h3>Detailed Instructions</h3>
+              <ol id="recipeSteps" class="steps-list"></ol>
+            </section>
+
+            <section class="recipe-section">
+              <h3>Tips & Variations</h3>
+              <div id="recipeTipsVariations"></div>
+            </section>
+          </div>
+        </div>
+      </div>
+
+    </article>
+
+  </main>
+
+  <!-- Floating Chatbot -->
+  <div class="chatbot-wrapper">
+    <button id="chatbotToggleBtn" class="chatbot-toggle">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+    </button>
+
+    <div id="chatbotPanel" class="chatbot-panel hidden">
+      <div class="chatbot-header">
+        <h3>Kitchen Assistant</h3>
+        <button id="chatbotCloseBtn" aria-label="Close Chat">&times;</button>
+      </div>
+      <div id="chatbotMessages" class="chatbot-messages">
+        <div class="message assistant">
+          <p>Hi! I'm your kitchen assistant. Ask me anything about the recipe!</p>
+        </div>
+      </div>
+      <div class="chatbot-input-area">
+        <input type="text" id="chatbotInput" placeholder="Ask a question...">
+        <button id="chatbotSendBtn">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="config.js"></script>
+  <script src="recommendations.js"></script>
+  <script src="flowDiagram.js"></script>
+  <script src="chatbot.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
